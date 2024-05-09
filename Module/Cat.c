@@ -21,6 +21,8 @@
 #define MY_MAJOR 415
 #define MY_MINOR 0
 #define DEVICE_NAME "Cat"
+#define IOCTL_SET_MODE_ENCRYPT _IOR('h', 1, unsigned long)
+#define IOCTL_SET_MODE_DECRYPT _IOR('h', 2, unsigned long)
 
 int major ,minor;
 char *kernel_buffer;
@@ -88,7 +90,6 @@ static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
     // int encrpytionkey = data->encryptionKey;
-    encrypt(data->mybuffer);
     //Copy the message to the user
     if (copy_to_user(buff, data->mybuffer, strlen(data->mybuffer)+1)){
         printk(KERN_INFO "fail to copy to user Meow! Meow!\n");
@@ -141,11 +142,11 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
     printk(KERN_INFO "I/O control myIoctl %d Meow! Meow!\n",command);
 
     switch (command){
-        case 1:            
+        case IOCTL_SET_MODE_ENCRYPT:            
             printk(KERN_INFO "----Meow! Meow! encrypt updated-----\n");
             encrypt(data->mybuffer);
             break;
-        case 2:
+        case IOCTL_SET_MODE_DECRYPT:
             printk(KERN_INFO "----Meow! Meow! Decrypt updated----\n");
             decrypt(data->mybuffer);
             break;
@@ -153,10 +154,6 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
             printk(KERN_INFO "----fail in myIoctl updated----\n");
             return -1;
     }   
-
-    // //copy kernel memory to user space 
-    // count = (int *)data;
-    // int bytesNotCopied=copy_to_user(count,&(data->encryptionKey),sizeof(struct file_data));
 
     return 0;
 }

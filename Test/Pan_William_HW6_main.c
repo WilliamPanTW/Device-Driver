@@ -18,16 +18,17 @@
 #include <unistd.h>
 #include <errno.h>
 
+#define IOCTL_SET_MODE_ENCRYPT _IOR('h', 1, unsigned long)
+#define IOCTL_SET_MODE_DECRYPT _IOR('h', 2, unsigned long)
+
 int main(int argc , char * argv[]){
-    int fd , info;
+    int fd;
+    long command;
     char text[500]; //store string from user 
     char buffer[1024];//store string from kernel
 
-    int key , command;
-    printf("Welcome to cat Caesar Cipher\n");
     // open our kernel module 
     fd=open("/dev/Cat",O_RDWR);
-    printf("return from open file %d \n",fd);
     if(fd<0){
         printf("Device open error\n");
         perror("Device file open error");
@@ -36,17 +37,20 @@ int main(int argc , char * argv[]){
         printf("Device Open success\n");
     }
     
-    printf("1. Encrypt\n2. decrypt\n3. exit\n");
+    printf("Welcome to cat Caesar Cipher\n");
+    printf("1. Encrypt\n2. Decrypt\n3. exit\n");
     printf("Please enter number of your service: ");
-    scanf("%d", & command);
+    scanf("%ld", &command);
     switch (command) {
         case 1:            
             printf("Enter a message to encrypt: ");
-            scanf("%s", text);        
+            scanf("%s", text);
+            command = IOCTL_SET_MODE_ENCRYPT;        
             break;
         case 2:
             printf("Enter a message to decrypt: ");
             scanf("%s", text);
+            command = IOCTL_SET_MODE_DECRYPT;        
             break;  
         case 3:
             printf("bye , Meow~ \n");
@@ -63,11 +67,12 @@ int main(int argc , char * argv[]){
         close(fd);
         return -1;
     }else{
-        printf("write %ld to device success\n",bytes_written);
+        // printf("write %ld to device success\n",bytes_written);//success
     }
-
-    // Switch to encrypt decrypt mode
-    if (ioctl(fd, command, 0) != 0) {
+    
+    // Switch to encrypt or decrypt mode
+    long control = ioctl(fd, command, 0);
+    if ( control!= 0) {
         perror("Failed to set encrypt mode");
         close(fd);
         return -1;
@@ -79,15 +84,14 @@ int main(int argc , char * argv[]){
             close(fd);
         return -1;
         }else{
-            printf("Device read success\n");
-            printf("Bytes read: %d\n", (int)bytes_read);
-            printf("buffer output: %s\n", buffer);
+            // printf("Device read success\n");
+            // printf("Bytes read: %d\n", (int)bytes_read);
+            printf("Your output: %s\n", buffer);
         }
     }
 
 
-
-
+    printf("Service charge $1000, Meow! \n");
     close(fd);
 
     return 0;
