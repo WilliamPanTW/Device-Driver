@@ -22,6 +22,36 @@ int main(int argc , char * argv[]){
     int fd , info;
     long n1,n2,n3;  
     char buffer[1024];
+    
+    char text[500], ch;
+
+    int key , options;
+    printf("Welcome to cat Caesar Cipher\n");
+    printf("1. Encrypt\n2. decrypt\n3. exit\n");
+    printf("Please enter number of your service: ");
+    scanf("%d", & options);
+    switch (options) {
+        case 1:            
+            printf("Enter a message to encrypt: ");
+            scanf("%s", text);
+            printf("Enter the key: ");
+            scanf("%d", & key);
+            break;
+        case 2:
+            printf("Enter a message to decrypt: ");
+            scanf("%s", text);
+            printf("Enter the key: ");
+            scanf("%d", & key);
+            break;  
+        case 3:
+            printf("bye , Meow~ \n");
+            return 0;  
+        default:
+            printf("unrecognized service. Bye Meow~ \n");
+            return 0;
+    }
+    // Taking user input.
+   
 
     // open our kernel module 
     fd=open("/dev/Cat",O_RDWR);
