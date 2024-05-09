@@ -59,10 +59,8 @@ static ssize_t myWrite(struct file *fs , const char __user * buff , size_t hsize
 static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff_t * off){
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
-    int encrpytionkey = data->encryptionKey;
-    printk(KERN_INFO "we read: %lu on read number\n",hsize);
-
-    printk(KERN_INFO "Reading myRead %d Meow! Meow!\n",encrpytionkey);
+    // int encrpytionkey = data->encryptionKey;
+    printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",buff);
     return 0;//end of file 
 }
 
@@ -104,13 +102,19 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
     struct file_data * data;
     data = (struct file_data *) fs->private_data;
     
-    printk(KERN_INFO "I/O control myIoctl Meow! Meow!\n");
+    printk(KERN_INFO "I/O control myIoctl %d Meow! Meow!\n",command);
 
-    //only support command 3
-    if(command !=3){
-        printk(KERN_INFO "fail in myIoctl\n");
-        return -1;
-    }
+    switch (command){
+        case 1:            
+            printk(KERN_INFO "----Meow! Meow! encrypt-----\n");
+            break;
+        case 2:
+            printk(KERN_INFO "----Meow! Meow! Decrypt----\n");
+            break;
+        default:
+            printk(KERN_INFO "----fail in myIoctl----\n");
+            return -1;
+    }   
 
     //copy kernel memory to user space 
     count = (int *)data;
