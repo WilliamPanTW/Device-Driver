@@ -37,6 +37,30 @@ struct file_data {
     char mybuffer[];
 };
 
+// Function to encrypt the message by shifting each character by 2 spots
+void encrypt(char *message) {
+    while (*message != '\0') {
+        if (*message >= 'a' && *message <= 'z') {
+            *message = (*message - 'a' + 2) % 26 + 'a';
+        } else if (*message >= 'A' && *message <= 'Z') {
+            *message = (*message - 'A' + 2) % 26 + 'A';
+        }
+        message++;
+    }
+}
+
+// Function to decrypt the message by shifting each character back by 2 spots
+void decrypt(char *message) {
+    while (*message != '\0') {
+        if (*message >= 'a' && *message <= 'z') {
+            *message = (*message - 'a' - 2 + 26) % 26 + 'a';
+        } else if (*message >= 'A' && *message <= 'Z') {
+            *message = (*message - 'A' - 2 + 26) % 26 + 'A';
+        }
+        message++;
+    }
+}
+
 // this write function increment the data structure count every time it is call 
 // return how many bytes were passed in 
 static ssize_t myWrite(struct file *fs , const char __user * buff , size_t hsize , loff_t * off){
@@ -64,7 +88,7 @@ static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
     // int encrpytionkey = data->encryptionKey;
-
+    encrypt(data->mybuffer);
     //Copy the message to the user
     if (copy_to_user(buff, data->mybuffer, strlen(data->mybuffer)+1)){
         printk(KERN_INFO "fail to copy to user Meow! Meow!\n");
