@@ -34,13 +34,37 @@ int main(int argc , char * argv[]){
         printf("Device Open success\n");
     }
 
+
     // Read our kernel module 
-    // ssize_t bytes_read = read(fd, buffer, 1024);
-    // if (bytes_read < 0) {
-    //     perror("Failed to read from the device");
-    //     close(fd);
-    //     return -1;
-    // }
+    ssize_t bytes_read = read(fd, buffer, 1024);
+    if (bytes_read < 0) {
+        perror("Failed to read from the device");
+        close(fd);
+        return -1;
+    }else{
+        printf("Device read success\n");
+    }
+
+    // Switch to encrypt decrypt mode
+    if (ioctl(fd, 3, 0) < 0) {
+    perror("Failed to set encrypt mode");
+    close(fd);
+    return -1;
+    }else{
+        printf("Device I/O control success\n");
+    }
+
+    // Write our device driver 
+    const char *message = "Hello, Device!"; // miss paremeter loff_t * off
+    ssize_t bytes_written = write(fd, message, strlen(message));
+    if (bytes_written < 0) {
+        perror("Failed to write to the device");
+        close(fd);
+        return -1;
+    }else{
+        printf("Device write success\n");
+    }
+
 
     // n1=write(fd,"testing",10);
     // n2=ioctl(fd,3,&info);
