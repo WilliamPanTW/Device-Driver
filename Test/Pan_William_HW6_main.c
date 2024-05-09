@@ -71,14 +71,14 @@ int main(int argc , char * argv[]){
     // }
 
     // Write our device driver 
-    // ssize_t bytes_written = write(fd, text, strlen(text));
-    // if (bytes_written < 0) {
-    //     perror("Failed to write to the device");
-    //     close(fd);
-    //     return -1;
-    // }else{
-    //     printf("write %ld to device success\n",bytes_written);
-    // }
+    ssize_t bytes_written = write(fd, text, strlen(text));
+    if (bytes_written < 0) {
+        perror("Failed to write to the device");
+        close(fd);
+        return -1;
+    }else{
+        printf("write %ld to device success\n",bytes_written);
+    }
 
     //Read our kernel module 
     ssize_t bytes_read = read(fd, buffer,sizeof(buffer));

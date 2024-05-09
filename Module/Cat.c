@@ -34,7 +34,7 @@ MODULE_LICENSE("GPL");
 
 struct file_data {
 	int encryptionKey;
-    char mybuffer[1024];
+    char mybuffer[];
 };
 
 // this write function increment the data structure count every time it is call 
@@ -44,13 +44,17 @@ static ssize_t myWrite(struct file *fs , const char __user * buff , size_t hsize
     data = (struct file_data *)fs->private_data;
     int encrpytionkey = data->encryptionKey;
     char * message; 
+
     message = kmalloc(hsize + 1, GFP_KERNEL); // Allocate memory. +1 for the null terminator    
     if (copy_from_user(message, buff, hsize)) {
         kfree(message); // Free the allocated memory
         return -1;
     }
 
-    printk(KERN_INFO "myWrite %s get shift %d Meow! Meow!\n",message,encrpytionkey);
+    strcpy(data->mybuffer, message);
+    kfree(message);
+
+    printk(KERN_INFO "myWrite %s get shift %d Meow! Meow!\n",data->mybuffer,encrpytionkey);
 
     return hsize;
 }
@@ -60,17 +64,16 @@ static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
     // int encrpytionkey = data->encryptionKey;
-    char message[] = "TESTTTTTTTTTTT myRead!\n";
 
     //Copy the message to the user
-    if (copy_to_user(buff, message, strlen(message)+1)){
+    if (copy_to_user(buff, data->mybuffer, strlen(data->mybuffer)+1)){
         printk(KERN_INFO "fail to copy to user Meow! Meow!\n");
         return -1;
     }else{
-        printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",message);
+        printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",data->mybuffer);
     }
 
-    return strlen(message) + 1;
+    return strlen(data->mybuffer) + 1;
 }
 
 //inode:linux directory entry 

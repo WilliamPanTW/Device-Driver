@@ -38,11 +38,12 @@ __used __section("__versions") = {
 	{ 0xeb233a45, "__kmalloc" },
 	{ 0x88db9f48, "__check_object_size" },
 	{ 0x13c49cc2, "_copy_from_user" },
-	{ 0x37a0cba, "kfree" },
-	{ 0x6b10bee1, "_copy_to_user" },
 	{ 0xa916b694, "strnlen" },
-	{ 0xf0fdf6cb, "__stack_chk_fail" },
+	{ 0x69acdf38, "memcpy" },
+	{ 0x37a0cba, "kfree" },
 	{ 0xcbd4898c, "fortify_panic" },
+	{ 0x754d539c, "strlen" },
+	{ 0x6b10bee1, "_copy_to_user" },
 	{ 0x3fd78f3b, "register_chrdev_region" },
 	{ 0xa6f7a612, "cdev_init" },
 	{ 0xf4407d6b, "cdev_add" },
@@ -59,4 +60,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "353FDB587BD195E006422E1");
+MODULE_INFO(srcversion, "E770DFE48FE76617903A5EE");
