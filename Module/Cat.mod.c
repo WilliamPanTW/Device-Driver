@@ -41,7 +41,6 @@ __used __section("__versions") = {
 	{ 0x37a0cba, "kfree" },
 	{ 0x6b10bee1, "_copy_to_user" },
 	{ 0xa916b694, "strnlen" },
-	{ 0x7682ba4e, "__copy_overflow" },
 	{ 0xf0fdf6cb, "__stack_chk_fail" },
 	{ 0xcbd4898c, "fortify_panic" },
 	{ 0x3fd78f3b, "register_chrdev_region" },
@@ -60,4 +59,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "861C33BC1CE396328672C65");
+MODULE_INFO(srcversion, "353FDB587BD195E006422E1");

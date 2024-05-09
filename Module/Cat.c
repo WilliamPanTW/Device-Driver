@@ -63,10 +63,11 @@ static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff
     char message[] = "TESTTTTTTTTTTT myRead!\n";
 
     //Copy the message to the user
-    if (copy_to_user(buff, message, hsize)){
-        printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",message);
-    }else{
+    if (copy_to_user(buff, message, strlen(message)+1)){
+        printk(KERN_INFO "fail to copy to user Meow! Meow!\n");
         return -1;
+    }else{
+        printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",message);
     }
 
     return strlen(message) + 1;

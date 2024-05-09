@@ -20,7 +20,8 @@
 
 int main(int argc , char * argv[]){
     int fd , info;
-    char text[500];
+    char text[500]; //store string from user 
+    char buffer[1024];//store string from kernel
 
     int key , command;
     printf("Welcome to cat Caesar Cipher\n");
@@ -79,18 +80,16 @@ int main(int argc , char * argv[]){
     //     printf("write %ld to device success\n",bytes_written);
     // }
 
-    char buffer[1024];
     //Read our kernel module 
     ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
     if (bytes_read < 0) {
         perror("Failed to read from the device");
-        printf("Error code: %d\n", errno); // Print the error code
         close(fd);
         return -1;
     }else{
         printf("Device read success\n");
         printf("Bytes read: %d\n", (int)bytes_read);
-        printf("Data read: %s\n", buffer);
+        printf("buffer output: %s\n", buffer);
     }
 
 
