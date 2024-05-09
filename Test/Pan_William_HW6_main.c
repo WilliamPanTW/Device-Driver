@@ -20,9 +20,11 @@
 
 int main(int argc , char * argv[]){
     int fd , info;
-    long n1,n2,n3;
+    long n1,n2,n3;  
+    char buffer[1024];
 
-    fd=open("/dev/Cat",O_WRONLY);
+    // open our kernel module 
+    fd=open("/dev/Cat",O_RDWR);
     printf("return from open file %d \n",fd);
     if(fd<0){
         printf("Device open error\n");
@@ -32,9 +34,18 @@ int main(int argc , char * argv[]){
         printf("Device Open success\n");
     }
 
-    n1=write(fd,"testing",10);
-    n2=ioctl(fd,3,&info);
-    printf("wrote to %d that return %ld count %d - Rel val from ioctl:%ld\n",fd,n1,info,n2);
+    // Read our kernel module 
+    // ssize_t bytes_read = read(fd, buffer, 1024);
+    // if (bytes_read < 0) {
+    //     perror("Failed to read from the device");
+    //     close(fd);
+    //     return -1;
+    // }
+
+    // n1=write(fd,"testing",10);
+    // n2=ioctl(fd,3,&info);
+    // printf("wrote to %d that return %ld count %d - Rel val from ioctl:%ld\n",fd,n1,info,n2);
+
     close(fd);
 
     return 0;
