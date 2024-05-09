@@ -20,7 +20,7 @@
 
 int main(int argc , char * argv[]){
     int fd , info;
-    char text[500], buffer[1024];
+    char text[500];
 
     int key , command;
     printf("Welcome to cat Caesar Cipher\n");
@@ -31,14 +31,14 @@ int main(int argc , char * argv[]){
         case 1:            
             printf("Enter a message to encrypt: ");
             scanf("%s", text);
-            printf("Enter the key(0-26): ");
-            scanf("%d", & key);
+            // printf("Enter the key(1-25): ");
+            // scanf("%d", & key);
             break;
         case 2:
             printf("Enter a message to decrypt: ");
             scanf("%s", text);
-            printf("Enter the key(0-26): ");
-            scanf("%d", & key);
+            // printf("Enter the key(1-25): ");
+            // scanf("%d", & key);
             break;  
         case 3:
             printf("bye , Meow~ \n");
@@ -47,7 +47,6 @@ int main(int argc , char * argv[]){
             printf("unrecognized service. Bye Meow~ \n");
             return 0;
     }   
-    printf("-------------text: %s and size: %ld--------------\n",text,sizeof(text));
 
     // open our kernel module 
     fd=open("/dev/Cat",O_RDWR);
@@ -62,35 +61,41 @@ int main(int argc , char * argv[]){
 
 
     // Switch to encrypt decrypt mode
-    if (ioctl(fd, command, 0) < 0) {
-        perror("Failed to set encrypt mode");
-        close(fd);
-        return -1;
-    }else{
-        printf("Device I/O control success\n");
-    }
-
-
-    // // Read our kernel module 
-    // ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
-    // if (bytes_read < 0) {
-    //     perror("Failed to read from the device");
+    // if (ioctl(fd, command, 0) < 0) {
+    //     perror("Failed to set encrypt mode");
     //     close(fd);
     //     return -1;
     // }else{
-    //     printf("Device read success txt\n");
+    //     printf("Device I/O control success\n");
     // }
 
-    // // Write our device driver 
-    // const char *message = "Hello, Device!"; // miss paremeter loff_t * off
-    // ssize_t bytes_written = write(fd, message, strlen(message));
+    // Write our device driver 
+    // ssize_t bytes_written = write(fd, text, strlen(text));
     // if (bytes_written < 0) {
     //     perror("Failed to write to the device");
     //     close(fd);
     //     return -1;
     // }else{
-    //     printf("Device write success\n");
+    //     printf("write %ld to device success\n",bytes_written);
     // }
+
+    char buffer[1024];
+    //Read our kernel module 
+    ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
+    if (bytes_read < 0) {
+        perror("Failed to read from the device");
+        printf("Error code: %d\n", errno); // Print the error code
+        close(fd);
+        return -1;
+    }else{
+        printf("Device read success\n");
+        printf("Bytes read: %d\n", (int)bytes_read);
+        printf("Data read: %s\n", buffer);
+    }
+
+
+
+
 
     close(fd);
 

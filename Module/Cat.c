@@ -34,6 +34,7 @@ MODULE_LICENSE("GPL");
 
 struct file_data {
 	int encryptionKey;
+    char mybuffer[1024];
 };
 
 // this write function increment the data structure count every time it is call 
@@ -42,16 +43,15 @@ static ssize_t myWrite(struct file *fs , const char __user * buff , size_t hsize
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
     int encrpytionkey = data->encryptionKey;
-    printk("Device Write Procedure Begins - (%p,%ld): ", fs, hsize);
+    char * message; 
+    message = kmalloc(hsize + 1, GFP_KERNEL); // Allocate memory. +1 for the null terminator    
+    if (copy_from_user(message, buff, hsize)) {
+        kfree(message); // Free the allocated memory
+        return -1;
+    }
 
+    printk(KERN_INFO "myWrite %s get shift %d Meow! Meow!\n",message,encrpytionkey);
 
-    // if (copy_from_user(message, buff, hsize)) {
-    //     kfree(message); // Free the allocated memory
-    //     return -EFAULT;
-    // }
-
-
-    printk(KERN_INFO "Writing myWrite %d Meow! Meow!\n",encrpytionkey);
     return hsize;
 }
 
@@ -60,8 +60,16 @@ static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff
     struct file_data * data;
     data = (struct file_data *)fs->private_data;
     // int encrpytionkey = data->encryptionKey;
-    printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",buff);
-    return 0;//end of file 
+    char message[] = "TESTTTTTTTTTTT myRead!\n";
+
+    //Copy the message to the user
+    if (copy_to_user(buff, message, hsize)){
+        printk(KERN_INFO "MyRead service, text: %s Meow! Meow!\n",message);
+    }else{
+        return -1;
+    }
+
+    return strlen(message) + 1;
 }
 
 //inode:linux directory entry 
@@ -76,7 +84,7 @@ static int myOpen(struct inode *inode , struct file *fs){
         return -1;
     }
     
-    data->encryptionKey=0;
+    data->encryptionKey=3;
 
     //New Device Values Set to void pointer
     fs->private_data=data;
@@ -98,7 +106,7 @@ static int myClose(struct inode * inode,struct file *fs){
 // this is a way to deal with device file where there may not 
 //basically count how many time write was called 
 static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
-    int * count;
+    // int * count;
     struct file_data * data;
     data = (struct file_data *) fs->private_data;
     
@@ -106,21 +114,21 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
 
     switch (command){
         case 1:            
-            printk(KERN_INFO "----Meow! Meow! encrypt-----\n");
+            printk(KERN_INFO "----Meow! Meow! encrypt updated-----\n");
             break;
         case 2:
-            printk(KERN_INFO "----Meow! Meow! Decrypt----\n");
+            printk(KERN_INFO "----Meow! Meow! Decrypt updated----\n");
             break;
         default:
-            printk(KERN_INFO "----fail in myIoctl----\n");
+            printk(KERN_INFO "----fail in myIoctl updated----\n");
             return -1;
     }   
 
-    //copy kernel memory to user space 
-    count = (int *)data;
-    int bytesNotCopied=copy_to_user(count,&(data->encryptionKey),sizeof(struct file_data));
+    // //copy kernel memory to user space 
+    // count = (int *)data;
+    // int bytesNotCopied=copy_to_user(count,&(data->encryptionKey),sizeof(struct file_data));
 
-    return bytesNotCopied;
+    return 0;
 }
 
 //File operation core linux system support 
