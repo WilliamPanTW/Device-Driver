@@ -32,32 +32,66 @@ MODULE_AUTHOR("Pan William");
 MODULE_DESCRIPTION("Cat meow meow");
 MODULE_LICENSE("GPL");
 
+struct file_data {
+	int encryptionKey;
+};
+
 // this write function increment the data structure count every time it is call 
 // return how many bytes were passed in 
 static ssize_t myWrite(struct file *fs , const char __user * buff , size_t hsize , loff_t * off){
-    printk(KERN_INFO "Writing myWrite Meow! Meow!\n");
-    printk(KERN_INFO "we wrote: %lu on write number\n",hsize);
+    struct file_data * data;
+    data = (struct file_data *)fs->private_data;
+    int encrpytionkey = data->encryptionKey;
+    printk("Device Write Procedure Begins - (%p,%ld): ", fs, hsize);
+
+
+    // if (copy_from_user(message, buff, hsize)) {
+    //     kfree(message); // Free the allocated memory
+    //     return -EFAULT;
+    // }
+
+
+    printk(KERN_INFO "Writing myWrite %d Meow! Meow!\n",encrpytionkey);
     return hsize;
 }
 
 //copy data to user buffer
 static ssize_t myRead(struct file *fs , char __user * buff , size_t hsize , loff_t * off){
-    printk(KERN_INFO "Reading myRead Meow! Meow!\n");
+    struct file_data * data;
+    data = (struct file_data *)fs->private_data;
+    int encrpytionkey = data->encryptionKey;
     printk(KERN_INFO "we read: %lu on read number\n",hsize);
-    return hsize;
+
+    printk(KERN_INFO "Reading myRead %d Meow! Meow!\n",encrpytionkey);
+    return 0;//end of file 
 }
 
 //inode:linux directory entry 
 //fs : file control block to track file when open 
 static int myOpen(struct inode *inode , struct file *fs){
     //vmalloc allocat kernel heap 
+    struct file_data * data;
+    data = vmalloc(sizeof(struct file_data));
+
+    if(!data){
+        printk(KERN_INFO "cannot vmalloc, failed to opened Meow! Meow!\n");    
+        return -1;
+    }
+    
+    data->encryptionKey=0;
+
+    //New Device Values Set to void pointer
+    fs->private_data=data;
+
     printk(KERN_INFO "Opening myOpen Meow! Meow!\n");
 
     return 0; 
 }
 
-static int myClose(struct inode * inode,struct file *file){
-    //vfree(ds);
+static int myClose(struct inode * inode,struct file *fs){
+    struct file_data * data;
+    data = (struct file_data *) fs->private_data;
+    vfree(data);
     printk(KERN_INFO "Closing myClose Meow! Meow!\n");
     return 0;
 }
@@ -66,6 +100,10 @@ static int myClose(struct inode * inode,struct file *file){
 // this is a way to deal with device file where there may not 
 //basically count how many time write was called 
 static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
+    int * count;
+    struct file_data * data;
+    data = (struct file_data *) fs->private_data;
+    
     printk(KERN_INFO "I/O control myIoctl Meow! Meow!\n");
 
     //only support command 3
@@ -75,8 +113,8 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
     }
 
     //copy kernel memory to user space 
-    // copy_to_user(count, &(ds->count),size)
-    int bytesNotCopied=0;
+    count = (int *)data;
+    int bytesNotCopied=copy_to_user(count,&(data->encryptionKey),sizeof(struct file_data));
 
     return bytesNotCopied;
 }
@@ -97,7 +135,7 @@ int init_module(void){
     int result,registers;
     dev_t devno;
 
-    devno = MKDEV(MY_MAJOR , MY_MINOR);//make a development number 
+    devno = MKDEV(MY_MAJOR , MY_MINOR);//make a development device number 
 
     registers = register_chrdev_region(devno, 1 , DEVICE_NAME);//register this device 
     printk(KERN_INFO "Register chardev succeeded :%d\n",registers);
