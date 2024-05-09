@@ -50,9 +50,9 @@ __used __section("__versions") = {
 	{ 0x6091b333, "unregister_chrdev_region" },
 	{ 0x8f44466e, "cdev_del" },
 	{ 0xbdfb6dbb, "__fentry__" },
+	{ 0x999e8297, "vfree" },
 	{ 0x122c3a7e, "_printk" },
 	{ 0x5b8239ca, "__x86_return_thunk" },
-	{ 0x999e8297, "vfree" },
 	{ 0xd6ee688f, "vmalloc" },
 	{ 0x2fa5cadd, "module_layout" },
 };
@@ -60,4 +60,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "0E2C13AA3734C65EA2416C8");
+MODULE_INFO(srcversion, "EA75F609AE008CBE8F6A41A");

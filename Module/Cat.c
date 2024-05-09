@@ -112,7 +112,7 @@ static int myOpen(struct inode *inode , struct file *fs){
         return -1;
     }
     
-    data->encryptionKey=3;
+    data->encryptionKey=0;
 
     //New Device Values Set to void pointer
     fs->private_data=data;
@@ -143,9 +143,11 @@ static long myIoCtl(struct file *fs , unsigned int command,unsigned long arg){
     switch (command){
         case 1:            
             printk(KERN_INFO "----Meow! Meow! encrypt updated-----\n");
+            encrypt(data->mybuffer);
             break;
         case 2:
             printk(KERN_INFO "----Meow! Meow! Decrypt updated----\n");
+            decrypt(data->mybuffer);
             break;
         default:
             printk(KERN_INFO "----fail in myIoctl updated----\n");

@@ -25,30 +25,6 @@ int main(int argc , char * argv[]){
 
     int key , command;
     printf("Welcome to cat Caesar Cipher\n");
-    printf("1. Encrypt\n2. decrypt\n3. exit\n");
-    printf("Please enter number of your service: ");
-    scanf("%d", & command);
-    switch (command) {
-        case 1:            
-            printf("Enter a message to encrypt: ");
-            scanf("%s", text);
-            // printf("Enter the key(1-25): ");
-            // scanf("%d", & key);
-            break;
-        case 2:
-            printf("Enter a message to decrypt: ");
-            scanf("%s", text);
-            // printf("Enter the key(1-25): ");
-            // scanf("%d", & key);
-            break;  
-        case 3:
-            printf("bye , Meow~ \n");
-            return 0;  
-        default:
-            printf("unrecognized service. Bye Meow~ \n");
-            return 0;
-    }   
-
     // open our kernel module 
     fd=open("/dev/Cat",O_RDWR);
     printf("return from open file %d \n",fd);
@@ -59,16 +35,26 @@ int main(int argc , char * argv[]){
     }else{
         printf("Device Open success\n");
     }
-
-
-    // Switch to encrypt decrypt mode
-    // if (ioctl(fd, command, 0) < 0) {
-    //     perror("Failed to set encrypt mode");
-    //     close(fd);
-    //     return -1;
-    // }else{
-    //     printf("Device I/O control success\n");
-    // }
+    
+    printf("1. Encrypt\n2. decrypt\n3. exit\n");
+    printf("Please enter number of your service: ");
+    scanf("%d", & command);
+    switch (command) {
+        case 1:            
+            printf("Enter a message to encrypt: ");
+            scanf("%s", text);        
+            break;
+        case 2:
+            printf("Enter a message to decrypt: ");
+            scanf("%s", text);
+            break;  
+        case 3:
+            printf("bye , Meow~ \n");
+            return 0;  
+        default:
+            printf("unrecognized service. Bye Meow~ \n");
+            return 0;
+    }   
 
     // Write our device driver 
     ssize_t bytes_written = write(fd, text, strlen(text));
@@ -80,18 +66,24 @@ int main(int argc , char * argv[]){
         printf("write %ld to device success\n",bytes_written);
     }
 
-    //Read our kernel module 
-    ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
-    if (bytes_read < 0) {
-        perror("Failed to read from the device");
+    // Switch to encrypt decrypt mode
+    if (ioctl(fd, command, 0) != 0) {
+        perror("Failed to set encrypt mode");
         close(fd);
         return -1;
     }else{
-        printf("Device read success\n");
-        printf("Bytes read: %d\n", (int)bytes_read);
-        printf("buffer output: %s\n", buffer);
+        //Read our kernel module to display 
+        ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
+        if (bytes_read < 0) {
+            perror("Failed to read from the device");
+            close(fd);
+        return -1;
+        }else{
+            printf("Device read success\n");
+            printf("Bytes read: %d\n", (int)bytes_read);
+            printf("buffer output: %s\n", buffer);
+        }
     }
-
 
 
 
