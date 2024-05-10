@@ -85,7 +85,7 @@ int main(int argc , char * argv[]){
         if (bytes_read < 0) {
             perror("Failed to read from the kernel space");
             close(fd);
-        return -1;
+            return -1;
         }else{
             // printf("Device read success\n");
             // printf("Bytes read: %d\n", (int)bytes_read);
