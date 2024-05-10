@@ -7,7 +7,7 @@
 *
 * File:: Pan_William_HW6_main.c
 *
-* Description:: Sample Device Driver 
+* Description:: test user applicatio for Device Driver 
 *
 **************************************************************/
 #include <stdio.h>
@@ -18,14 +18,15 @@
 #include <unistd.h>
 #include <errno.h>
 
+//unique number for I/O control 
 #define IOCTL_SET_MODE_ENCRYPT _IOR('h', 1, unsigned long)
 #define IOCTL_SET_MODE_DECRYPT _IOR('h', 2, unsigned long)
 
 int main(int argc , char * argv[]){
-    int fd;
-    long command;
-    char text[500]; //store string from user 
-    char buffer[1024];//store string from kernel
+    int fd;             //file descriptor 
+    long command;       //store user command for I/O control
+    char text[500];     //store string from user 
+    char buffer[1024];  //store string from kernel
 
     // open our kernel module 
     fd=open("/dev/Cat",O_RDWR);
@@ -39,8 +40,9 @@ int main(int argc , char * argv[]){
     
     printf("Welcome to cat Caesar Cipher\n");
     printf("1. Encrypt\n2. Decrypt\n3. exit\n");
-    printf("Please enter number of your service: ");
+    printf("Please enter number(1-3) of your service: ");
     scanf("%ld", &command);
+    //decide what command user enter and assign the unique number for I/O control
     switch (command) {
         case 1:            
             printf("Enter a message to encrypt: ");
@@ -60,27 +62,28 @@ int main(int argc , char * argv[]){
             return 0;
     }   
 
-    // Write our device driver 
+    // Write data from user space to kernel space 
     ssize_t bytes_written = write(fd, text, strlen(text));
     if (bytes_written < 0) {
-        perror("Failed to write to the device");
+        perror("Failed to write to the kernel space");
         close(fd);
         return -1;
     }else{
         // printf("write %ld to device success\n",bytes_written);//success
     }
     
-    // Switch to encrypt or decrypt mode
+    //call I/O control from file operation 
     long control = ioctl(fd, command, 0);
+    //if it success meaning it already encrypt/decrypt data
     if ( control!= 0) {
-        perror("Failed to set encrypt mode");
+        perror("Failed to set encrypt/decrypt mode");
         close(fd);
         return -1;
     }else{
-        //Read our kernel module to display 
+        //Read data form kernel space to user space 
         ssize_t bytes_read = read(fd, buffer,sizeof(buffer));
         if (bytes_read < 0) {
-            perror("Failed to read from the device");
+            perror("Failed to read from the kernel space");
             close(fd);
         return -1;
         }else{
@@ -92,7 +95,7 @@ int main(int argc , char * argv[]){
 
 
     printf("Service charge $1000, Meow! \n");
-    close(fd);
+    close(fd); //close file discriptor and triggers the kernel to call the .release
 
     return 0;
 }
